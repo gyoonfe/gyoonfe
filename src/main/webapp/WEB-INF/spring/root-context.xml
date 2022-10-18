@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+		
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<!-- <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" /> -->
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="username" value="jsl53" />
+		<property name="password" value="1234" />
+	</bean>
+
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+	<!-- 커넥션 풀 설정 -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 메일 설정 (NAVER) -->
+<!-- 	<bean id="mailSender" 	class="org.springframework.mail.javamail.JavaMailSenderImpl"> -->
+<!-- 		<property name="host" value="smtp.naver.com" /> 메이서버 호스트 -->
+<!-- 		<property name="port" value="465" /> 메이서버 포트번호 -->
+<!-- 		<property name="username" value="cyhs604@naver.com" /> 자신의 이메일 아이디 -->
+<!-- 		<property name="password" value="Jung!76054761" /> 자신의 비밀번호 -->
+		<!-- 보안연결 SSL과 관련된 설정 --> 
+<!-- 		<property name="javaMailProperties"> -->
+<!-- 			<props> -->
+<!-- 				<prop key="mail.smtp.auth">true</prop> -->
+<!-- 				<prop key="mail.smtp.starttls.enable">true</prop> -->
+<!-- 				<prop key="mail.transport.protocol">smtp</prop> -->
+<!-- 				<prop key="mail.smtps.checkserveridentity">true</prop> -->
+<!-- 				<prop key="mail.smtps.ssl.enable">true</prop> -->
+<!-- 				<prop key="mail.smtps.ssl.trust">*</prop> -->
+<!-- 				<prop key="mail.debug">true</prop> -->
+<!-- 				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop> -->
+<!-- 			</props> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+	<!-- 메일 설정 (Google) -->
+	<bean id="mailSender" 	class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" /> <!-- 메이서버 호스트 -->
+		<property name="port" value="587" /> <!-- 메이서버 포트번호 -->
+		<property name="username" value="gyoonproject@gmail.com" /> <!-- 자신의 이메일 아이디 -->
+		<property name="password" value="efatffvjuvajqmjb" /> <!-- 기기용 앱 비밀번호 -->
+		<!-- 보안연결 SSL과 관련된 설정 -->
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtps.checkserveridentity">true</prop>
+				<prop key="mail.smtps.ssl.enable">true</prop>
+				<prop key="mail.smtps.ssl.trust">*</prop>
+				<prop key="mail.debug">true</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+			</props>
+		</property>
+	</bean>
+
+	<mybatis-spring:scan
+		base-package="com.gyoontar.mapper" />
+
+	<context:component-scan
+		base-package="com.gyoontar.service"></context:component-scan>
+		
+</beans>

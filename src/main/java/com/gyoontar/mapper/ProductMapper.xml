@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyoontar.mapper.ProductMapper">
+
+	<sql id="criteria">
+	  <trim prefix="(" suffix=") and " prefixOverrides="OR">
+	    <foreach collection="typeArr" item="type">
+		  <trim prefix="OR">
+			<choose>
+				<when test="type == 'N'.toString()">
+					lower(pname) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'C'.toString()">
+					lower(pcontent) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'K'.toString()">
+					lower(kind) like '%'||lower(#{keyword})||'%'
+				</when>
+			</choose>
+		  </trim>
+	    </foreach>
+	  </trim>
+	</sql>
+
+	<select id="selectCount" resultType="int">
+		<![CDATA[
+			select count(*) from gt_product where 
+		]]>
+			<include refid="criteria"></include> 
+		<![CDATA[
+			pseq > 0
+		]]>
+	</select>
+
+	<select id="selectSaleCount" resultType="int">
+		<![CDATA[
+			select count(*) from gt_product where 
+		]]>
+			<include refid="criteria"></include> 
+		<![CDATA[
+			pseq > 0 and saleyn=1
+		]]>
+	</select>
+
+	<select id="selectKindCount" resultType="int">
+		<![CDATA[
+			select count(*) from gt_product where 
+		]]>
+			<include refid="criteria"></include> 
+		<![CDATA[
+			pseq > 0 and kind=#{category}
+		]]>
+	</select>
+
+<!-- ======================= Main ======================= -->
+
+	<select id="selectAll" resultType="com.gyoontar.domain.ProductVO">
+        <![CDATA[
+			SELECT 
+				pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+			FROM (
+				SELECT /*+ index_desc(gt_product gt_product_pk)*/ 
+					rownum rn,pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+				FROM gt_product 
+				WHERE pseq > 0 and 
+        ]]>
+		<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ) 
+			where rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="selectKind" resultType="com.gyoontar.domain.ProductVO">
+        <![CDATA[
+			SELECT 
+				pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+			FROM (
+				SELECT /*+ index_desc(gt_product gt_product_pk)*/ 
+					rownum rn,pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+				FROM gt_product 
+				WHERE pseq > 0 and kind=#{category} and 
+        ]]>
+		<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ) 
+			where rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="selectBest" resultType="com.gyoontar.domain.ProductVO">
+        <![CDATA[
+			SELECT 
+				* 
+			FROM 
+				gt_product 
+			WHERE bestyn=1
+        ]]>
+	</select>
+
+	<select id="selectSale" resultType="com.gyoontar.domain.ProductVO">
+        <![CDATA[
+			SELECT 
+				pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+			FROM (
+				SELECT /*+ index_desc(gt_product gt_product_pk)*/ 
+					rownum rn,pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,pregdate,bestyn,saleyn 
+				FROM gt_product 
+				WHERE pseq > 0 and saleyn=1 and
+        ]]>
+		<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ) 
+			where rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="view" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(gt_product gt_product_pk)*/ 
+		    * 
+		FROM gt_product 
+		WHERE pseq=#{pseq}
+	</select>
+	
+	<insert id="insert">
+		<selectKey keyProperty="pseq" order="BEFORE" resultType="int">
+			select gt_product_seq.nextval from dual 
+		</selectKey>
+		insert into gt_product (pseq,pname,kind,price1,price2,price3,pcontent,pquantity,pimage,bestyn,saleyn) 
+		values(#{pseq},#{pname},#{kind},#{price1},#{price2},#{price3},#{pcontent},#{pquantity},#{pimage},#{bestyn},#{saleyn})
+	</insert>
+
+	<update id="update">
+		update gt_product set 
+			pname=#{pname},
+			kind=#{kind},
+			price1=#{price1},
+			price2=#{price2},
+			price3=#{price3},
+			pcontent=#{pcontent},
+			pquantity=#{pquantity},
+			pimage=#{pimage},
+			pregdate=sysdate,
+			bestyn=#{bestyn},
+			saleyn=#{saleyn} 
+		where pseq=#{pseq}
+	</update>
+
+	<delete id="delete">
+		delete from gt_product where pseq=#{pseq}
+	</delete>
+
+<!-- ======================= Review & Comment ======================= -->
+
+	<select id="selectReview" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(p gt_product_review_pk)*/ 
+			p.revno, p.pseq, p.userid, m.nickname, p.revcontent, p.revregdate 
+		FROM gt_product_review p, gt_member m 
+		WHERE p.userid=m.userid and pseq=#{pseq}
+	</select>
+
+	<select id="selectComment" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(p gt_product_comment_pk)*/ 
+			p.comno, p.pseq, p.userid, m.nickname, p.comcontent, p.comreply, p.comregdate 
+		FROM gt_product_comment p, gt_member m 
+		WHERE p.userid=m.userid and pseq=#{pseq}
+	</select>
+
+	<select id="selectNoRepComCount" resultType="int">
+		SELECT /*+ index_desc(gt_product_comment gt_product_comment_pk)*/ 
+		    COUNT(*) 
+		FROM gt_product_comment 
+		WHERE pseq=#{pseq} AND comreply IS NULL OR comreply=''
+	</select>
+	
+	<select id="selectRevByUserid" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(r gt_product_review_pk)*/ 
+			r.revno, r.pseq, r.userid, r.revcontent, r.revregdate, p.pname 
+		FROM gt_product_review r, gt_product p 
+		WHERE r.pseq = p.pseq AND r.userid=#{userid}
+	</select>
+	
+	<select id="selectComByUserid" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(c gt_product_comment_pk)*/ 
+			c.comno, c.pseq, c.userid, c.comcontent, c.comreply, c.comregdate, p.pname 
+		FROM gt_product_comment c, gt_product p 
+		WHERE c.pseq = p.pseq AND c.userid=#{userid}
+	</select>
+
+	<select id="selectOneReview" resultType="com.gyoontar.domain.ProductVO">
+	  SELECT * FROM gt_product_review WHERE revno = #{revno}
+	</select>
+	
+	<select id="selectOneComment" resultType="com.gyoontar.domain.ProductVO">
+	  SELECT * FROM gt_product_comment WHERE comno = #{comno}
+	</select>
+
+	<insert id="insertReview">
+		<selectKey keyProperty="revno" order="BEFORE" resultType="int">
+			select gt_product_review_seq.nextval from dual
+		</selectKey>
+		insert into gt_product_review (revno,pseq,userid,revcontent) 
+		values(#{revno},#{pseq},#{userid},#{revcontent})
+	</insert>
+
+	<insert id="insertComment">
+		<selectKey keyProperty="comno" order="BEFORE" resultType="int">
+			select gt_product_comment_seq.nextval from dual
+		</selectKey>
+		insert into gt_product_comment (comno,pseq,userid,comcontent) 
+		values(#{comno},#{pseq},#{userid},#{comcontent})
+	</insert>
+
+	<update id="updateReview">
+		UPDATE gt_product_review SET revcontent=#{revcontent},revregdate=sysdate WHERE revno = #{revno}
+	</update>
+	
+	<update id="updateComment">
+		UPDATE gt_product_comment SET comcontent=#{comcontent},comregdate=sysdate WHERE comno = #{comno}
+	</update>
+
+	<update id="updateComReply">
+		UPDATE gt_product_comment SET comreply=#{comreply} WHERE comno = #{comno}
+	</update>
+
+	<delete id="deleteReview">
+		DELETE FROM gt_product_review WHERE revno = #{revno}
+	</delete>
+
+	<delete id="deleteComment">
+		DELETE FROM gt_product_comment WHERE comno = #{comno}
+	</delete>
+
+<!-- ======================= Wish List ======================= -->
+
+	<select id="selectWish" resultType="com.gyoontar.domain.ProductVO">
+		SELECT * FROM gt_product_wish WHERE pseq = #{pseq}
+	</select>
+
+	<select id="selectWishCount" resultType="int">
+		SELECT count(*) FROM gt_product_wish WHERE pseq = #{pseq}
+	</select>
+	
+	<select id="selectWishByUserid" resultType="com.gyoontar.domain.ProductVO">
+		SELECT /*+ index_desc(w gt_product_wish_pk)*/ 
+		  w.wno, w.userid, w.pseq, p.pname, p.kind, p.price2, p.pcontent, p.pquantity, p.pimage, p.pregdate, p.bestyn, p.saleyn 
+		FROM gt_product_wish w, gt_product p 
+		WHERE w.pseq = p.pseq AND w.userid = #{userid}
+	</select>
+
+	<insert id="insertWish">
+		<selectKey keyProperty="wno" order="BEFORE" resultType="int">
+			select gt_product_wish_seq.nextval from dual
+		</selectKey>
+		insert into gt_product_wish (wno,userid,pseq) 
+		values(#{wno},#{userid},#{pseq})
+	</insert>
+
+	<delete id="deleteWish">
+		DELETE FROM gt_product_wish WHERE userid=#{userid} AND pseq=#{pseq}
+	</delete>
+	
+	<delete id="deleteAllWish">
+		DELETE FROM gt_product_wish WHERE userid=#{userid}
+	</delete>
+
+</mapper>

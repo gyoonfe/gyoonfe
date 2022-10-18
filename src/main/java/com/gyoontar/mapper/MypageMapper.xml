@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyoontar.mapper.MypageMapper">
+
+	<sql id="criteria">
+	  <trim prefix="(" suffix=") and " prefixOverrides="OR">
+	    <foreach collection="typeArr" item="type">
+		  <trim prefix="OR">
+			<choose>
+				<when test="type == 'N'.toString()">
+					lower(mname) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'P'.toString()">
+					lower(pname) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'Z'.toString()">
+					lower(ozipcode) like '%'||lower(#{keyword})||'%'
+				</when>
+			</choose>
+		  </trim>
+	    </foreach>
+	  </trim>
+	</sql>
+
+	<sql id="criteria2">
+	  <trim prefix="(" suffix=") and " prefixOverrides="OR">
+	    <foreach collection="typeArr" item="type">
+		  <trim prefix="OR">
+			<choose>
+				<when test="type == 'N'.toString()">
+					lower(mname) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'I'.toString()">
+					lower(userid) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'T'.toString()">
+					lower(qtitle) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'C'.toString()">
+					lower(qcontent) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'R'.toString()">
+					lower(qreply) like '%'||lower(#{keyword})||'%'
+				</when>
+			</choose>
+		  </trim>
+	    </foreach>
+	  </trim>
+	</sql>
+	
+<!-- ======================= Main ======================= -->
+
+	
+	<select id="selectOrder" resultType="com.gyoontar.domain.OrderVO">
+		SELECT * FROM gt_order WHERE userid = #{userid} ORDER BY oseq DESC
+	</select>
+	
+	<select id="selectOneOrder" resultType="com.gyoontar.domain.OrderVO">
+		SELECT * FROM gt_order WHERE oseq = #{oseq}
+	</select>
+	
+	<select id="selectDetail" resultType="com.gyoontar.domain.OrderVO">
+		SELECT /*+ index_desc(d gt_order_detail_pk)*/ 
+			d.odseq, d.oseq, d.pseq, d.odquantity, d.odresult, p.pname, p.price2 
+		FROM gt_order_detail d, gt_product p  
+		WHERE d.pseq = p.pseq AND d.oseq = #{oseq}
+	</select>
+	
+	<select id="selectOrderSeq" resultType="int">
+		SELECT gt_order_seq.nextval FROM dual
+	</select>
+	<insert id="insertOrder">
+		INSERT INTO gt_order (oseq, userid, ozipcode, oaddress1, oaddress2) 
+		values(#{oseq}, #{userid}, #{ozipcode}, #{oaddress1}, #{oaddress2})
+	</insert>
+
+	<insert id="insertDetail">
+		<selectKey keyProperty="odseq" order="BEFORE" resultType="int">
+			SELECT gt_order_detail_seq.nextval FROM dual 
+		</selectKey>
+		INSERT INTO gt_order_detail (odseq, oseq, pseq, odquantity) 
+		values(#{odseq}, #{oseq}, #{pseq}, #{odquantity})
+	</insert>
+
+	<select id="selectCart" resultType="com.gyoontar.domain.CartVO">
+        <![CDATA[
+ 			SELECT /*+ index_desc(c gt_cart_pk)*/ 
+ 				c.cseq, c.userid, c.pseq, c.cquantity, c.cresult, c.cregdate, p.pname, p.price2 
+ 			FROM gt_cart c, gt_product p 
+ 			WHERE c.pseq = p.pseq 
+ 				AND c.userid = #{userid} 
+ 				AND c.cresult = 0
+        ]]>
+	</select>
+
+	<insert id="insertCart">
+		<selectKey keyProperty="cseq" order="BEFORE" resultType="int">
+			SELECT gt_cart_seq.nextval FROM dual 
+		</selectKey>
+		INSERT INTO gt_cart (cseq, userid, pseq, cquantity) 
+		values(#{cseq}, #{userid}, #{pseq}, #{cquantity})
+	</insert>
+
+	<update id="updateCartResult">
+		UPDATE gt_cart SET 
+		cresult = 1,
+		cregdate = sysdate 
+		WHERE cseq=#{cseq}
+	</update>
+	
+	<delete id="deleteCart">
+		DELETE FROM gt_cart WHERE cseq=#{cseq}
+	</delete>
+	
+	<select id="selectQna" resultType="com.gyoontar.domain.QnaVO">
+		SELECT /*+ index_desc(q gt_qna_pk)*/ 
+			q.qseq, q.userid, m.mname, q.qtitle, q.qcontent, q.qreply, q.qresult, q.qregdate  
+		FROM gt_qna q, gt_member m  
+		WHERE q.userid = m.userid AND q.userid = #{userid}
+	</select>
+	
+	<insert id="insertQna">
+		<selectKey keyProperty="qseq" order="BEFORE" resultType="int">
+			SELECT gt_qna_seq.nextval FROM dual 
+		</selectKey>
+		INSERT INTO gt_qna (qseq, userid, qtitle, qcontent) 
+		values(#{qseq}, #{userid}, #{qtitle}, #{qcontent})
+	</insert>
+
+<!-- ======================= Admin Page ======================= -->
+
+	<select id="selectAllOrder" resultType="com.gyoontar.domain.OrderVO">
+        <![CDATA[
+             SELECT odresult, oseq, odseq, pseq, userid, mname, pname, odquantity, ozipcode, oaddress1, oaddress2, phone, oregdate 
+             FROM ( 
+				SELECT /*+ index_desc(d gt_order_detail_pk)*/ 
+				    rownum rn, d.odresult, o.oseq, d.odseq, d.pseq, o.userid, m.mname, p.pname, d.odquantity, o.ozipcode, o.oaddress1, o.oaddress2, m.phone, o.oregdate 
+				FROM gt_order o, gt_order_detail d, gt_product p, gt_member m 
+				WHERE o.oseq = d.oseq AND d.pseq = p.pseq AND o.userid = m.userid AND 
+        ]]>
+				<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ORDER BY oseq DESC ) 
+			WHERE rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="selectOrderCount" resultType="int">
+        <![CDATA[
+			SELECT /*+ index_desc(d gt_order_detail_pk)*/ 
+			    count(*) 
+			FROM gt_order o, gt_order_detail d, gt_product p, gt_member m 
+			WHERE o.oseq = d.oseq AND d.pseq = p.pseq AND o.userid = m.userid AND 
+        ]]>
+				<include refid="criteria"></include>
+		<![CDATA[	
+			d.odseq > 0
+        ]]>
+	</select>
+
+	<update id="updateOdresult">
+		UPDATE gt_order_detail SET 
+		odresult = 1 
+		WHERE odseq=#{odseq}
+	</update>
+
+	<select id="selectAllQna" resultType="com.gyoontar.domain.QnaVO">
+			SELECT qseq, userid, mname, qtitle, qcontent, qreply, qresult, qregdate  
+			FROM ( 
+				SELECT /*+ index_desc(q gt_qna_pk)*/ 
+					rownum rn, q.qseq, q.userid, m.mname, q.qtitle, q.qcontent, q.qreply, q.qresult, q.qregdate  
+				FROM gt_qna q, gt_member m  
+				WHERE q.userid = m.userid AND  
+				<include refid="criteria2"></include>
+			<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ORDER BY qseq DESC ) 
+			WHERE rn > (#{pageNum}-1) * #{amount}
+	        ]]>
+	</select>
+
+	<select id="selectOneQna" resultType="com.gyoontar.domain.QnaVO">
+			SELECT /*+ index_desc(gt_qna gt_qna_pk)*/ 
+			    * 
+			FROM gt_qna 
+			WHERE qseq = #{qseq}
+	</select>
+
+	<select id="selectQnaCount" resultType="int">
+			SELECT /*+ index_desc(q gt_qna_pk)*/ 
+			    count(*) 
+			FROM gt_qna q, gt_member m  
+			WHERE q.userid = m.userid AND 
+			<include refid="criteria2"></include>
+		<![CDATA[	
+			q.qseq > 0
+	    ]]>
+	</select>
+
+	<update id="updateQna">
+		UPDATE gt_qna SET 
+		qreply = #{qreply},
+		qresult = #{qresult} 
+		WHERE qseq=#{qseq}
+	</update>
+
+	<update id="updateQresult">
+		UPDATE gt_qna SET 
+		qresult = #{qresult} 
+		WHERE qseq=#{qseq}
+	</update>
+
+	<delete id="qnaDelete">
+		DELETE FROM gt_qna WHERE qseq=#{qseq}
+	</delete>
+
+	<select id="allMonthly" resultType="com.gyoontar.domain.StatisticsVO">
+	    SELECT  
+	        sum(d.odquantity * p.price2) as price, count(*) as count    
+	    FROM gt_order o, gt_order_detail d, gt_product p  
+	    WHERE o.oseq = d.oseq  
+	      AND d.pseq = p.pseq   
+	      AND TO_CHAR(oregdate,'yyyy')=#{yyyy}  
+	      AND TO_CHAR(oregdate,'MM')=#{mm}
+	</select>
+	
+	<select id="pseqMonthly" resultType="com.gyoontar.domain.StatisticsVO">
+	    SELECT  
+	        sum(d.odquantity * p.price2) as price, count(*) as count    
+	    FROM gt_order o, gt_order_detail d, gt_product p  
+	    WHERE o.oseq = d.oseq  
+	      AND d.pseq = p.pseq   
+	      AND d.pseq=#{pseq}  
+	      AND TO_CHAR(oregdate,'yyyy')=#{yyyy}  
+	      AND TO_CHAR(oregdate,'MM')=#{mm}
+	</select>
+
+</mapper>

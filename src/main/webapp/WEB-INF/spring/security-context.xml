@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+									<!-- 5.0버전은 에러가 발생 버그 때문에 지우기 -->
+	<bean id="customAccessDenied" class="com.gyoontar.security.CustomAccessDeniedHandler"></bean>		
+	<bean id="customLoginSuccess" class="com.gyoontar.security.CustomLoginSuccessHandler"></bean>
+	<bean id="customUserDetailsService" class="com.gyoontar.security.CustomUserDetailsService"></bean>
+	<bean id="bcryptPasswordEndcoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>			
+																		
+	<security:http auto-config="true" use-expressions="true">
+		<security:intercept-url pattern="/" access="permitAll" />
+		<security:intercept-url pattern="/board/board.do" access="permitAll" />
+
+		<security:intercept-url pattern="/member/login.do" access="isAnonymous()" />
+		<security:intercept-url pattern="/member/contract.do" access="isAnonymous()" />
+		<security:intercept-url pattern="/member/join.do" access="isAnonymous()" />
+		
+		<security:intercept-url pattern="/board/boardView.do" access="hasRole('ROLE_MEMBER')" />
+		<security:intercept-url pattern="/board/boardWrite.do" access="hasRole('ROLE_MEMBER')" />
+		<security:intercept-url pattern="/board/boardUpdate.do" access="hasRole('ROLE_MEMBER')" />
+		<security:intercept-url pattern="/board/boardDelete.do" access="hasRole('ROLE_MEMBER')" />
+		<security:intercept-url pattern="/board/boardRepWrite.do" access="hasRole('ROLE_MEMBER')" />
+		<security:intercept-url pattern="/mypage/**" access="hasRole('ROLE_MEMBER')" />
+		
+		<security:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+
+		<!--     hasRole() - 사용자가 주어진 역할이 있다면 접근 허용 -->
+		<!--     hasAnyRole() - 사용자가 주어진 어떤 권한이라도 있으면 허용 -->
+		<!--     authenticated() - 인증된 사용자의 접근만 허용 -->
+		<!--     anonymous() - 익명 사용자 허용 -->
+		<!--     permitAll() - 무조건 허용 -->
+		<!--     denyAll() - 무조건 차단 -->
+
+		<security:access-denied-handler ref="customAccessDenied" />
+		<security:form-login login-page="/member/login.do" authentication-success-handler-ref="customLoginSuccess"/>
+		<security:logout logout-url="/member/logout.do" logout-success-url="/member/login.do" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>
+		<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="customUserDetailsService">
+			<security:password-encoder ref="bcryptPasswordEndcoder" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>

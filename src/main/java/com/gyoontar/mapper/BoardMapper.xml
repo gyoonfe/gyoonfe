@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyoontar.mapper.BoardMapper">
+
+	<sql id="criteria">
+	  <trim prefix="(" suffix=") and " prefixOverrides="OR">
+	    <foreach collection="typeArr" item="type">
+		  <trim prefix="OR">
+			<choose>
+				<when test="type == 'T'.toString()">
+					lower(title) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'C'.toString()">
+					lower(content) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'W'.toString()">
+					lower(nickname) like '%'||lower(#{keyword})||'%'
+				</when>
+			</choose>
+		  </trim>
+	    </foreach>
+	  </trim>
+	</sql>
+
+	<select id="selectCount" resultType="int">
+		<![CDATA[
+			SELECT /*+ index_desc(b gt_board_pk)*/ 
+			    count(*) 
+			FROM gt_board b, gt_member m 
+			WHERE b.userid = m.userid AND 
+		]]>
+			<include refid="criteria"></include> 
+		<![CDATA[
+			bno > 0
+		]]>
+	</select>
+
+	<update id="plusHits">
+		update gt_board set 
+		hits=hits+1
+		where bno=#{bno}
+	</update>
+
+	<select id="maxBno" resultType="int">
+		select max(bno) from gt_board
+	</select>
+	
+	<select id="minBno" resultType="int">
+		select min(bno) from gt_board
+	</select>
+
+	<select id="nextBvo" resultType="com.gyoontar.domain.BoardVO">
+		<![CDATA[
+			select * from gt_board where bno = (select min(bno) from gt_board where bno > #{bno})
+		]]>
+		<!-- select * from (select * from notice order by bno asc) where bno > #{bno} and rownum=1 -->
+	</select>
+
+	<select id="prevBvo" resultType="com.gyoontar.domain.BoardVO">
+		<![CDATA[
+			select * from gt_board where bno = (select max(bno) from gt_board where bno < #{bno})
+		]]>
+	</select>
+	
+<!-- ======================= Main ======================= -->
+
+	<select id="selectNotice" resultType="com.gyoontar.domain.BoardVO">
+        <![CDATA[
+			SELECT /*+ index_desc(b gt_board_pk)*/ 
+			    b.bno,b.userid,m.nickname,b.title,b.content,b.hits,b.regdate,b.noticeyn 
+			FROM gt_board b, gt_member m 
+			WHERE b.userid = m.userid AND bno > 0 AND noticeyn = 1ORDER BY bno DESC 
+        ]]>
+	</select>
+
+	<select id="select" resultType="com.gyoontar.domain.BoardVO">
+        <![CDATA[
+             select bno,userid,nickname,title,content,hits,regdate,noticeyn 
+             from ( 
+				SELECT /*+ index_desc(b gt_board_pk)*/ 
+				    rownum rn,b.bno,b.userid,m.nickname,b.title,b.content,b.hits,b.regdate,b.noticeyn 
+				FROM gt_board b, gt_member m 
+				WHERE b.userid = m.userid and 
+        ]]>
+		<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ) 
+			where rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="selectByUserid" resultType="com.gyoontar.domain.BoardVO">
+		SELECT /*+ index_desc(gt_board gt_board_pk)*/ 
+			* 
+		FROM gt_board 
+		WHERE userid = #{userid}
+	</select>
+
+	<select id="view" resultType="com.gyoontar.domain.BoardVO">
+		SELECT /*+ index_desc(gt_board gt_board_pk)*/ 
+		    b.bno,b.userid,m.nickname,b.title,b.content,b.hits,b.regdate,b.noticeyn 
+		FROM gt_board b, gt_member m 
+		WHERE b.userid = m.userid AND bno=#{bno}
+	</select>
+	
+	<insert id="insert">
+		<selectKey keyProperty="bno" order="BEFORE" resultType="int">
+			select gt_board_seq.nextval from dual
+		</selectKey>
+		insert into gt_board (bno,title,content,userid,noticeyn) 
+		values(#{bno},#{title},#{content},#{userid},#{noticeyn})
+	</insert>
+
+	<update id="update">
+		update gt_board set 
+		title=#{title},
+		content=#{content},
+		hits=#{hits},
+		regdate=sysdate 
+		where bno=#{bno}
+	</update>
+	
+	<delete id="delete">
+		delete from gt_board where bno=#{bno}
+	</delete>
+
+<!-- ======================= GT_BOARD_REPLY ======================= -->
+
+	<select id="selectReply" resultType="com.gyoontar.domain.BoardVO"> <!-- Select all reply for this board -->
+        <![CDATA[
+			SELECT /*+ index_desc(b gt_board_reply_pk)*/ 
+			    b.repno,b.bno,b.userid,m.nickname,b.repcontent,b.repregdate 
+			FROM gt_board_reply b, gt_member m 
+			WHERE b.userid = m.userid and repno > 0 and bno=#{bno}
+        ]]>
+	</select>
+	
+	<select id="selectReplyByUserid" resultType="com.gyoontar.domain.BoardVO"> 
+		SELECT /*+ index_desc(r gt_board_reply_pk)*/ 
+			r.repno, r.bno, r.userid, r.repcontent, r.repregdate, b.title, b.regdate 
+		FROM gt_board_reply r, gt_board b 
+		WHERE r.bno = b.bno AND r.userid = #{userid}
+	</select>
+	
+	<select id="selectOneReply" resultType="com.gyoontar.domain.BoardVO">
+		SELECT *
+		FROM gt_board_reply 
+		WHERE repno = #{repno}
+	</select>
+
+	<insert id="insertReply">
+		<selectKey keyProperty="repno" order="BEFORE" resultType="int">
+			select gt_board_reply_seq.nextval from dual
+		</selectKey>
+		insert into gt_board_reply (repno,bno,repcontent,userid) 
+		values(#{repno},#{bno},#{repcontent},#{userid})
+	</insert>
+
+	<update id="updateReply">
+		update gt_board_reply set 
+		repcontent = #{repcontent},
+		repregdate = sysdate 
+		where repno=#{repno}
+	</update>
+
+	<delete id="deleteReply">
+		delete from gt_board_reply where repno=#{repno}
+	</delete>
+
+<!-- ======================= GT_BOARD_LIKE ======================= --> 
+
+	<select id="selectLikeCount" resultType="int"> <!-- Select count of LIKE for this board -->
+        <![CDATA[
+             select count(*) from gt_board_like where blno > 0 and bno=#{bno}
+        ]]>
+	</select>
+	
+	<select id="selectLike" resultType="com.gyoontar.domain.BoardVO"> 
+        <![CDATA[
+             select * from gt_board_like where blno > 0 and bno=#{bno}
+        ]]>
+	</select>
+	
+	<select id="selectLikeByUserid" resultType="com.gyoontar.domain.BoardVO"> 
+		SELECT /*+ index_desc(l gt_board_like_pk)*/ 
+			l.blno, l.userid, l.bno, b.title, b.content, b.hits, b.regdate, b.noticeyn 
+		FROM gt_board_like l, gt_board b 
+		WHERE l.bno = b.bno AND l.userid = #{userid}
+	</select>
+	
+	<insert id="addLike">
+		<selectKey keyProperty="blno" order="BEFORE" resultType="int">
+			select gt_board_like_seq.nextval from dual
+		</selectKey>
+		insert into gt_board_like (blno,userid,bno) 
+		values(#{blno},#{userid},#{bno})
+	</insert>
+	
+	<delete id="deleteLike">
+		delete from gt_board_like where bno=#{bno} and userid=#{userid}
+	</delete>
+
+	<delete id="deleteAllLike">
+		delete from gt_board_like where userid=#{userid}
+	</delete>
+
+</mapper>

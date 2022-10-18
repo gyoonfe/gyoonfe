@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyoontar.mapper.MemberMapper">
+
+	<sql id="criteria">
+	  <trim prefix="(" suffix=") and " prefixOverrides="OR">
+	    <foreach collection="typeArr" item="type">
+		  <trim prefix="OR">
+			<choose>
+				<when test="type == 'I'.toString()">
+					lower(userid) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'M'.toString()">
+					lower(mname) like '%'||lower(#{keyword})||'%'
+				</when>
+				<when test="type == 'N'.toString()">
+					lower(nickname) like '%'||lower(#{keyword})||'%'
+				</when>
+			</choose>
+		  </trim>
+	    </foreach>
+	  </trim>
+	</sql>
+
+	<select id="selectCount" resultType="int">
+		<![CDATA[
+			select count(*) from gt_member where admin=0 and 
+		]]>
+			<include refid="criteria"></include> 
+		<![CDATA[
+			rownum > 0
+		]]>
+	</select>
+	
+<!-- ======================= Main ======================= -->
+
+	<select id="selectAll" resultType="com.gyoontar.domain.MemberVO">
+        <![CDATA[
+             SELECT userid,pass,mname,nickname,sex,email,phone,zipcode,address1,address2,mprofile,regdate,status 
+             from ( 
+				SELECT 
+				    rownum rn,userid,pass,mname,nickname,sex,email,phone,zipcode,address1,address2,mprofile,regdate,status 
+				FROM gt_member 
+				WHERE admin=0 and 
+        ]]>
+		<include refid="criteria"></include>
+		<![CDATA[	
+			 	rownum <= #{pageNum} * #{amount} ORDER BY regdate DESC) 
+			where rn > (#{pageNum}-1) * #{amount}
+        ]]>
+	</select>
+
+	<select id="view" resultType="com.gyoontar.domain.MemberVO">
+		SELECT /*+ index(gt_member gt_member_pk)*/ 
+		    * 
+		FROM gt_member 
+		WHERE userid=#{userid}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO gt_member (userid,pass,mname,nickname,sex,email,phone,zipcode,address1,address2,mprofile,admin) 
+		values(#{userid},#{pass},#{mname},#{nickname},#{sex},#{email},#{phone},#{zipcode},#{address1},#{address2},#{mprofile,jdbcType=NUMERIC},0)
+	</insert>
+
+	<update id="toDormant">
+		update gt_member set 
+			status=1 
+		where userid=#{userid}
+	</update>
+	<update id="notDormant">
+		update gt_member set 
+			status=0 
+		where userid=#{userid}
+	</update>
+
+	<update id="updateMember">
+		UPDATE gt_member set 
+			mname=#{mname},
+			nickname=#{nickname},
+			sex=#{sex},
+			email=#{email},
+			phone=#{phone},
+			zipcode=#{zipcode},
+			address1=#{address1},
+			address2=#{address2},
+			mprofile=#{mprofile,jdbcType=NUMERIC} 
+		WHERE userid=#{userid}
+	</update>
+
+	<update id="changePW">
+		UPDATE gt_member set 
+			pass=#{pass}  
+		WHERE userid=#{userid}
+	</update>
+
+<!-- ======================= Admin Page ======================= -->
+
+	<select id="selectAdmin" resultType="com.gyoontar.domain.MemberVO">
+        <![CDATA[
+             SELECT * 
+             FROM gt_member 
+             WHERE admin=1 
+             ORDER BY regdate DESC
+        ]]>
+	</select>
+
+	<select id="selectCountAdmin" resultType="int">
+		<![CDATA[
+			select count(*) from gt_member where admin=1
+		]]>
+	</select>
+
+	<delete id="adminDelete">
+		delete from gt_member where userid=#{userid}
+	</delete>
+
+	<select id="checkUserid" resultType="int">
+		<![CDATA[
+			select count(*) from gt_member WHERE userid=#{userid}
+		]]>
+	</select>
+
+	<select id="checkNickname" resultType="int">
+		<![CDATA[
+			select count(*) from gt_member WHERE nickname=#{nickname}
+		]]>
+	</select>
+
+	<select id="checkUpdateNickname" resultType="int">
+		<![CDATA[
+			select count(*) from gt_member WHERE nickname=#{nickname} AND NOT userid=#{userid}
+		]]>
+	</select>
+
+	<insert id="insertAdmin">
+		INSERT INTO gt_member (userid,pass,mname,nickname,sex,email,phone,zipcode,address1,address2,mprofile,admin) 
+		values(#{userid},#{pass},#{mname},#{nickname},#{sex},#{email},#{phone},#{zipcode},#{address1},#{address2},#{mprofile,jdbcType=NUMERIC},1)
+	</insert>
+
+	<insert id="insertAuth">
+		INSERT INTO gt_member_auth 
+			(userid,auth) 
+			values (#{userid},#{auth})
+	</insert>
+
+	<update id="updateAdmin">
+		UPDATE gt_member set 
+			pass=#{pass},
+			mname=#{mname},
+			nickname=#{nickname},
+			sex=#{sex},
+			email=#{email},
+			phone=#{phone},
+			zipcode=#{zipcode},
+			address1=#{address1},
+			address2=#{address2},
+			mprofile=#{mprofile,jdbcType=NUMERIC} 
+		WHERE userid=#{userid}
+	</update>
+
+<!-- ======================= Security (for customUserDetailsService.java) ======================= -->
+
+     <resultMap type="com.gyoontar.domain.MemberVO" id="memberMap">
+          <id property="userid" column="userid" />
+          <result property="userid" column="userid" />
+          <result property="pass" column="pass" />
+          <result property="mname" column="mname" />
+          <result property="nickname" column="nickname" />
+          <result property="sex" column="sex" />
+          <result property="email" column="email" />
+          <result property="phone" column="phone" />
+          <result property="zipcode" column="zipcode" />
+          <result property="address1" column="address1" />
+          <result property="address2" column="address2" />
+          <result property="mprofile" column="mprofile" />
+          <result property="regdate" column="regdate" />
+          <result property="status" column="status" />
+          <result property="admin" column="admin" />
+          <collection property="authList" resultMap="authMap">
+          </collection>
+     </resultMap> <!-- 여러개의 데이터를 처리하는 경우 1:N의 결과를 처리할 수 있는 resultMap 태그 사용 -->
+
+     <resultMap type="com.gyoontar.domain.AuthVO" id="authMap">
+          <result property="userid" column="userid" />
+          <result property="auth" column="auth" />
+     </resultMap>
+
+     <select id="read" resultMap="memberMap"> <!-- mem 테이블과 auth 테이블을 쪼인하여 userid에 해당하는 항목들을 가져옴. -->
+          SELECT 
+               m.userid, m.pass, m.mname, m.nickname, m.sex, m.email, m.phone, m.zipcode, m.address1, m.address2, m.mprofile, m.regdate, m.status, m.admin, auth  
+          FROM 
+               gt_member m 
+          LEFT OUTER JOIN gt_member_auth auth 
+          ON m.userid = auth.userid 
+          WHERE m.userid = #{userid}
+     </select>
+
+</mapper>

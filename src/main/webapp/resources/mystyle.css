@@ -1,0 +1,626 @@
+﻿@charset "UTF-8";
+
+.gyoon-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  margin-bottom: 20px;
+}
+.gyoon-nav a{ color:black; }
+
+.gyoon-nav a:hover { color:black; text-decoration: underline; }
+.gyoon-nav a:focus { color:#ffffff; background-color:red; text-decoration: none; }
+.gyoon-nav a:active { color:#ffffff; background-color:red; text-decoration: none; }
+
+.gyoon-nav-search i {
+  padding-left: 0;
+}
+
+.btn-check:focus+.btn-outline-dark, .btn-outline-dark:focus {
+    box-shadow: 0 0 0 0.25rem rgb(255 255 255 / 50%);
+}
+.btn-outline-dark:hover {
+    color: #fff;
+    background-color: #fb0303;
+    border-color: #ff0000;
+}
+.gyoon-nav-menu {
+  margin: 0;
+  list-style: none;
+  display: flex;
+}
+.gyoon-nav-menu li {
+	
+}
+.gyoon-nav-icons {
+  margin: 0;
+  list-style: none;
+  display: flex;
+}
+.gyoon-nav-icons li {
+
+}
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: red;
+}
+.gyoon-logout{
+	padding: 8px 16px;
+    background-color: transparent;
+    border: none;
+}
+.gyoon-logout:hover{ text-decoration: underline; }
+.gyoon-logout:active{ color: #ffffff; background-color: red; text-decoration: none; }
+
+@media screen and (max-width: 991px) {
+
+	.gyoon-nav {
+	  flex-direction: column;
+	  align-items: flex-start;
+	  padding-top: 10px;
+	  margin-bottom: 20px;
+	}
+    .gyoon-nav-menu {
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .gyoon-nav-menu li {
+      text-align: center;
+    }
+	.dropdown-menu {
+	    align-items: center;
+	}
+    .gyoon-nav-icons {
+      justify-content: center;
+      width: 100%;
+    }
+    .gyoon-sidebar {
+	    display: none;
+	}
+	.gyoon-sidebar2 {
+	    display: none;
+	}
+	.gyoon-mypage-nav d-flex d-flex {
+	    display: block;
+	}
+}
+
+.gyoon-mypage-nav d-flex d-flex {
+    display: none;
+}
+
+/* 사이드바 실험 */
+.gyoon-sidebar-container {
+    display: flex; 
+    flex-flow: row nowrap; 
+}
+.gyoon-sidebar { /* product sidebar */
+    width: 20%;
+    height: 600px; 
+    position: sticky;
+    top: 100px; 
+    background: white;
+    border: solid 1px #c8c9ca;
+}
+.gyoon-sidebar2 { /* mypage sidebar */
+    width: 30%;
+    height: 560px; 
+    position: sticky;
+    top: 100px; 
+    background: white;
+    border: solid 1px #c8c9ca;
+}
+
+/*스크롤바*/
+.scrollspy-example::-webkit-scrollbar {
+  width: 15px;
+}
+.scrollspy-example::-webkit-scrollbar-thumb {
+  background-color: #2f3542;
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+.scrollspy-example::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
+}
+
+body::-webkit-scrollbar {
+  width: 20px;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #2f3542;
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+body::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0px 0px 5px white;
+}
+/*스크롤바*/
+
+.gyoon-redressed{
+	font-family: 'Redressed', cursive;
+}
+
+.img-thumbnail { /* 썸네일 테두리 없앰 */
+    padding: 0.25rem;
+    background-color: #fff;
+    border: 1px solid rgb(0 0 0 / 0%);
+    border-radius: 0.25rem;
+    max-width: 100%;
+    height: auto;
+}
+.product-content {
+	overflow:auto; height: 200px;	
+}
+.gyoon-img-hover { 
+	overflow: visible;
+}
+.gyoon-img-hover img { 
+	transform:scale(1.0);
+	transition: transform .5s; 
+}
+.gyoon-img-hover:hover img { 
+	transform:scale(1.1);
+	transition: transform .5s; 
+}
+.gyoon-divUP-hover { 
+	overflow: hidden;
+}
+.gyoon-divUP-hover { 
+	transform:scale(1.0);
+	transition: transform .5s; 
+}
+.gyoon-divUP-hover:hover { 
+	transform:scale(1.1);
+	transition: transform .5s; 
+}
+
+.button-hover{
+	border: solid 2px black;
+}
+.button-hover:hover {
+	color:red;
+	border-color:red;
+	cursor: pointer;
+}
+.button-inModal{
+	border: solid 1px white;
+}
+.button-inModal:hover {
+	color:red;
+	background-color:white;
+	border-color:white; 
+	cursor: pointer;
+}
+
+.gyoon-textarea {
+	background-color: #ffffff;
+	border-color: black;
+}
+
+ .gyoon-link a:link { 
+     color: #343a40;
+     text-decoration: none;
+ }
+ .gyoon-link a:visited {
+     color: #343a40;
+     text-decoration: none;
+ }
+ .gyoon-link a:hover {
+   color: red;
+ }
+ .gyoon-link a:hover i {
+   color: black;
+ }
+ .gyoon-link a:active {  
+   color: white;
+   background-color: red;
+ }  
+ .top_gyoontar a:link { 
+     color: white;
+     text-decoration: none;
+ }
+ .top_gyoontar a:visited {
+     color: white;
+     text-decoration: none;
+ }
+ .top_gyoontar a:hover {
+   color: red;
+ }
+ .top_gyoontar a:active {  
+   color: red;
+   background-color: #212529;
+ }  
+ 
+/* Contract.do */
+.form-check-input:checked {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+.form-check-input:focus {
+    border-color: #808080;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgb(139 137 137 / 25%);
+}
+/* Contract.do */
+
+.form-control:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: black;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgb(255 0 24 / 25%);
+}
+.gyoon-content .form-control:disabled {
+	border-color: white;
+	background-color: transparent;
+	word-break:break-all; /* 단어 단위가 아니더라도 자동 개행 ! */
+}
+.gyoon-content .form-control[readonly] {
+	border-color: white;
+	background-color: transparent;
+	word-break:break-all; /* 단어 단위가 아니더라도 자동 개행 ! */
+}
+.gyoon-content p {
+	border-color: white;
+	background-color: transparent;
+	word-break:break-all; /* 단어 단위가 아니더라도 자동 개행 ! */
+}
+.form-select-sm option:hover { /* No..... */
+    color: white;
+    background-color: red;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #343a40;
+    background-color: #f9fafb00;
+    box-shadow: 0 0 0 0.1rem #000000;
+}
+.accordion-button:focus {
+    z-index: 3;
+    border-color: #dc3545;
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem #000000;
+}
+.accordion-button:not(.collapsed)::after {
+    transform: rotate(-180deg);
+}
+
+/* modal test*/
+#modal.modal-overlay {
+	z-index: 2;
+    width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+#modal .modal-window {
+    background: rgb(108 0 0 / 75%);
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 13.5px );
+    -webkit-backdrop-filter: blur( 13.5px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+/*     position: relative; */
+/*     top: -100px; */
+/*     padding: 10px; */
+position: fixed;
+top: 50%;
+left: 50%;
+-webkit-transform: translate(-50%, -50%);
+-moz-transform: translate(-50%, -50%);
+-ms-transform: translate(-50%, -50%);
+-o-transform: translate(-50%, -50%);
+transform: translate(-50%, -50%);
+    overflow:auto; width: 900px; height: 700px; /* 조절 필요 !!! */
+}
+#modal .title {
+    padding-left: 10px;
+    display: inline;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+#modal .title h2 {
+    display: inline;
+}
+#modal .close-area {
+    display: inline;
+    float: right;
+    padding: 10px;
+    cursor: pointer;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+    font-size: 25px;
+}
+#modal .content {
+    margin-top: 20px;
+    padding: 0px 10px;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+
+#modal2.modal-overlay2 {
+	z-index: 2;
+    width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+#modal2 .modal-window2 {
+    background: rgb(108 0 0 / 75%);
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 13.5px );
+    -webkit-backdrop-filter: blur( 13.5px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+/*     position: relative; */
+/*     top: -100px; */
+/*     padding: 10px; */
+position: fixed;
+top: 50%;
+left: 50%;
+-webkit-transform: translate(-50%, -50%);
+-moz-transform: translate(-50%, -50%);
+-ms-transform: translate(-50%, -50%);
+-o-transform: translate(-50%, -50%);
+transform: translate(-50%, -50%);
+    overflow:auto; width: 900px; height: 700px; /* 조절 필요 !!! */
+}
+#modal2 .title2 {
+    padding-left: 10px;
+    display: inline;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+#modal2 .title2 h2 {
+    display: inline;
+}
+#modal2 .close-area2 {
+    display: inline;
+    float: right;
+    padding: 10px;
+    cursor: pointer;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+    font-size: 25px;
+}
+#modal2 .content2 {
+    margin-top: 20px;
+    padding: 0px 10px;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+/*
+#alertModal.alertModal-overlay {
+    width: 100%;
+    height: 350%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+#alertModal .modal-window {
+    background: rgb(108 0 0 / 75%);
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 13.5px );
+    -webkit-backdrop-filter: blur( 13.5px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    position: relative;
+    top: -100px;
+    padding: 10px;
+    overflow:auto; width: 900px; height: 700px;
+}
+#alertModal .title {
+    padding-left: 10px;
+    display: inline;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+#alertModal .title h2 {
+    display: inline;
+}
+#alertModal .close-alertModal-area {
+    display: inline;
+    float: right;
+    padding: 10px;
+    cursor: pointer;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+    font-size: 25px;
+}
+#alertModal .content {
+    margin-top: 20px;
+    padding: 0px 10px;
+    text-shadow: 1px 1px 2px gray;
+    color: white;
+}
+*/
+#mprofile_modal{
+	border-radius: 250px;
+	width: 500px;
+	height: 500px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #00000099;
+	display: none;
+}
+#mprofile_modal img{
+	border-radius: 200px;
+	width: 400px;
+	height: 400px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#repUpdate-modal{
+	z-index: 3;
+	border-radius:20px;
+	width: 600px;
+	height: 400px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #00000099;
+	display: none;
+}
+#repUpdate-context{
+	width: 500px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.btn-repUpdate{
+	background-color: white;
+}
+.btn-repUpdate:hover {
+    box-shadow: 0 0 0 0.25rem rgb(255 0 24 / 25%);
+	border: solid 1px #333;
+	color: red;
+}
+
+/* product_view's COMMENT & REVIEW */
+.gyoon-com-rev .nav-link {
+    display: block;
+    padding: 0.5rem rem 1rem;
+    color: #000000;
+    text-decoration: none;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
+}
+.gyoon-com-rev .nav-tabs {
+    border-bottom: 1px solid #000000;
+}
+.gyoon-com-rev .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+	color: red;
+    border-color: #000000 #000000 white #000000 ;
+    isolation: isolate;
+}
+
+.gyoon-heart:hover {
+	color: red;
+	cursor: pointer;
+}
+
+.carousel-control-prev-icon{
+	color: #333;
+}
+
+.gyoon-border-white textarea{
+	border-color: transparent;
+}
+.gyoon-contract{ height:600px; overflow-y: scroll; }
+.gyoon-pd-mg {
+	padding-left: 100px; padding-right: 100px; margin-top: 50px; margin-bottom: 50px;
+}
+.gyoon-big-pd-mg {
+	padding-left: 200px; padding-right: 200px; margin-top: 70px; margin-bottom: 70px;
+}
+.label-mg label{
+	margin-top: 5px; margin-bottom: 5px;
+}
+.label-bg label{
+	margin-top: 10px; margin-bottom: 10px;
+}
+.label-best{ background-color: #76000073; border-radius: 10px; }
+.boxes .box { /*input box*/
+	border-color: black; border-radius: 0; width: 300px;
+}
+.boxes .box_sm { /*input box*/
+	border-color: black; border-radius: 0; width: 100px;
+}
+
+.border_trans{ border-color: transparent; }
+.border_white { border-color: white; }
+.border_333 { border-color: #333; }
+.border_upload { border: solid 1px black; padding: 2px;}
+.border_top_black { border-top: solid 2px black; }
+.border_bottom_black { border-bottom: solid 2px black; }
+.border_top_white { border-top: solid 4px white; }
+.border_bottom_white { border-bottom: solid 4px white; }
+.bg_grey { background-color: #0000001c }
+.w_500 { width:500px; }
+.w_150 { width: 150px; }
+.h_30 { height: 30px; }
+.h_305 { height: 305px; }
+.h_70_td td { height: 70px; }
+.image_size{ max-width: 500px; max-height: 500px; }
+.mt_100{ margin-top: 100px; }
+.mt_150{ margin-top: 150px; }
+.mt_200{ margin-top: 200px; }
+.mb_100{ margin-bottom: 100px; }
+.mb_150{ margin-bottom: 150px; }
+.mb_200{ margin-bottom: 200px; }
+.px_200{ padding-left: 200px; padding-right: 200px; }
+.pimage-size{ width:200px; height:600px; }
+.mprofile-size-cursor{
+	max-width: 50px; max-height: 50px; cursor: pointer;
+}
+.mprofile-size{
+	max-width: 300px; max-height: 300px;
+}
+.myprofile-size-cursor{
+	width: 100px; height: 100px; cursor: pointer;
+}
+.myprofile-size-no{
+	width: 100px; height: 100px;
+}
+.myprofile-size{
+	width: 250px; height: 150px;"
+}
+.wish-size-cursor {
+	width: 150px; height: 150px; cursor: pointer;
+}
+
+
+.onInsta , .onFace, .onTwit, .onYou {
+	cursor: pointer;
+}
+
